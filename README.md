@@ -1,31 +1,90 @@
-# Olá, eu sou o Gustavo Bortolotti 👋
+<div align="center">
 
-Estudante de **Análise e Desenvolvimento de Sistemas** na **Universidade Cruzeiro do Sul**, no começo da jornada em programação e em busca de uma primeira oportunidade na área de tecnologia.
+<img src="assets/banner.png" alt="Gustavo Bortolotti — estudante de Análise e Desenvolvimento de Sistemas" width="100%">
 
-## Estudando agora
+[**Sobre**](#sobre-mim) · [**Formação**](#formação) · [**Aprendizado**](#o-que-estou-aprendendo) · [**Projetos**](#projetos-em-destaque) · [**Próximos passos**](#próximos-passos) · [**English**](#in-english)
 
-- **Algoritmos e pensamento computacional**, com a linguagem **C**
-- Lógica de programação, vetores, ordenação e uso de arquivos
-- Fundamentos de **Git e GitHub** para organizar e publicar meus estudos
+</div>
 
-## Projetos
+## Sobre mim
 
-| Projeto | Descrição |
+Sou o Gustavo, estudante de Análise e Desenvolvimento de Sistemas na Universidade Cruzeiro do Sul. Estou no começo da minha trajetória em programação e uso o GitHub para organizar o que estudo, registrar minha evolução e buscar minha **primeira oportunidade na área de tecnologia** (estágio ou vaga júnior).
+
+Ainda não tenho experiência profissional em tecnologia. O que posso mostrar aqui é dedicação, organização e projetos pequenos e bem explicados.
+
+## Formação
+
+- **Tecnólogo em Análise e Desenvolvimento de Sistemas**, Universidade Cruzeiro do Sul (em andamento)
+
+## O que estou aprendendo
+
+| Tema | Em que ponto estou |
 |---|---|
-| [gerenciador-de-tarefas-c](https://github.com/silvaguh747-oss/gerenciador-de-tarefas-c) | Programa de terminal em C para gerenciar tarefas, com dados salvos em arquivo |
-| [exercicios-c](https://github.com/silvaguh747-oss/exercicios-c) | Exercícios básicos de C para praticar entrada, condicionais, laços e vetores |
+| **Linguagem C** | Iniciante: entrada e saída, decisões, laços, vetores e arquivos simples |
+| **Lógica e algoritmos** | Estudando na disciplina de Algoritmos e Pensamento Computacional |
+| **Git e GitHub** | Iniciante: commits, push e organização de repositórios |
+| **VS Code e terminal** | Uso diário nos estudos |
 
-Os projetos são **materiais de estudo**. Quando uma IA ajuda a escrever o código, isso está dito no README de cada repositório, junto com a lista do que pretendo implementar sozinho.
+Não listo aqui tecnologias que ainda não estudei de verdade. Quando eu avançar, esta tabela muda.
 
-## Ferramentas que uso
+## Projetos em destaque
 
-![C](https://img.shields.io/badge/C-estudando-blue)
-![Git](https://img.shields.io/badge/Git-iniciante-orange)
-![VS Code](https://img.shields.io/badge/VS%20Code-editor-informational)
+Os projetos abaixo são **materiais de estudo**. O código foi escrito com a ajuda de uma IA e o README de cada um explica isso. Meu papel é estudar, executar, entender e implementar as melhorias listadas.
 
-## Objetivo
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <a href="https://github.com/silvaguh747-oss/gerenciador-de-tarefas-c">
+        <img src="assets/card-gerenciador.png" alt="Gerenciador de Tarefas em C">
+      </a>
+      <br><b>Problema:</b> manter uma lista de tarefas simples, sem perder os dados ao fechar o programa.
+      <br><b>Como:</b> menu no terminal, <code>struct</code> para cada tarefa e gravação em arquivo de texto.
+    </td>
+    <td width="50%" valign="top">
+      <a href="https://github.com/silvaguh747-oss/exercicios-c">
+        <img src="assets/card-exercicios.png" alt="Exercícios em C">
+      </a>
+      <br><b>Problema:</b> praticar os fundamentos de C com programas curtos que dá para refazer.
+      <br><b>Como:</b> média de notas, tabuada, maior valor de um vetor e par ou ímpar.
+    </td>
+  </tr>
+</table>
 
-Construir uma base sólida em lógica e programação, publicar projetos pequenos e bem explicados, e conseguir um estágio ou vaga júnior para aprender na prática.
+<details>
+<summary><b>Como executar os projetos</b></summary>
+
+<br>
+
+Com o compilador GCC instalado, dentro da pasta de cada projeto:
+
+```bash
+gcc -Wall -Wextra -o tarefas tarefas.c
+./tarefas
+```
+
+No PowerShell do Windows, use `.\tarefas.exe`. As instruções completas estão no README de cada repositório.
+
+</details>
+
+<details>
+<summary><b>Como eu estudo</b></summary>
+
+<br>
+
+1. Leio e executo o código pronto.
+2. Refaço sem consultar.
+3. Implemento uma melhoria da lista do README.
+4. Faço o commit e registro o que aprendi.
+
+</details>
+
+## Próximos passos
+
+- [ ] Refazer os exercícios de C sem consultar o código
+- [ ] Implementar as melhorias do gerenciador de tarefas (prioridade, edição, memória dinâmica)
+- [ ] Aprender a dividir um programa em vários arquivos
+- [ ] Estudar estruturas de dados básicas
+- [ ] Criar um projeto novo, escolhido e planejado por mim
 
 ## Contato
 
@@ -33,6 +92,6 @@ Pelo GitHub: [@silvaguh747-oss](https://github.com/silvaguh747-oss)
 
 ---
 
-### 🇬🇧 In English
+### In English
 
-I'm Gustavo, an Information Systems Analysis and Development student at Cruzeiro do Sul University, just starting out in programming. I'm currently studying algorithms with C and learning Git/GitHub, and I'm looking for an internship or junior opportunity. The projects here are learning material, and each README explains what I built or studied and what I plan to improve. (Written in basic English; I'm not claiming fluency.)
+I'm Gustavo, an Information Systems Analysis and Development student at Cruzeiro do Sul University, just starting out in programming. I'm learning C, algorithms and Git/GitHub, and I'm looking for an internship or junior opportunity. The projects here are learning material, and each README explains what I studied and what I plan to improve. (Basic English; I'm not claiming fluency.)

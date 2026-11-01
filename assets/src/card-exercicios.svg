@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 300" width="640" height="300">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#3b82f6"/></linearGradient>
+  </defs>
+  <rect width="640" height="300" fill="#0d1117"/>
+  <rect x="1.5" y="1.5" width="637" height="297" rx="16" fill="#161b22" stroke="#30363d" stroke-width="3"/>
+  <rect x="1.5" y="40" width="6" height="220" rx="3" fill="url(#g)"/>
+  <g font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif">
+    <text x="40" y="62" font-size="14" font-weight="600" letter-spacing="2" fill="#22d3ee">MATERIAL DE ESTUDO</text>
+    <text x="40" y="118" font-size="34" font-weight="700" fill="#f0f6fc">Exercícios em C</text>
+    <text x="40" y="162" font-size="20" fill="#c9d1d9">Programas curtos para praticar entrada de</text>
+    <text x="40" y="190" font-size="20" fill="#c9d1d9">dados, decisões, laços e vetores.</text>
+    <rect x="40" y="228" width="44" height="30" rx="15" fill="#0d1117" stroke="#30363d"/>
+    <text x="62" y="249" font-size="16" fill="#e6edf3" text-anchor="middle">C</text>
+    <rect x="96" y="228" width="70" height="30" rx="15" fill="#0d1117" stroke="#30363d"/>
+    <text x="131" y="249" font-size="16" fill="#e6edf3" text-anchor="middle">laços</text>
+    <rect x="178" y="228" width="84" height="30" rx="15" fill="#0d1117" stroke="#30363d"/>
+    <text x="220" y="249" font-size="16" fill="#e6edf3" text-anchor="middle">vetores</text>
+  </g>
+</svg>

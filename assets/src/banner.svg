@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 320" width="1280" height="320">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#161b22"/>
+      <stop offset="1" stop-color="#0a0e13"/>
+    </linearGradient>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#22d3ee"/>
+      <stop offset="1" stop-color="#3b82f6"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="320" fill="url(#bg)"/>
+  <g stroke="#22d3ee" stroke-opacity="0.18" stroke-width="2" fill="none" stroke-linecap="round">
+    <path d="M760 70H1000V40H1280"/><path d="M820 280H1060V250H1280"/>
+  </g>
+  <g fill="#22d3ee" fill-opacity="0.35"><circle cx="760" cy="70" r="5"/><circle cx="820" cy="280" r="5"/></g>
+  <rect x="80" y="86" width="64" height="5" rx="2.5" fill="url(#g)"/>
+  <g font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif">
+    <text x="80" y="165" font-size="60" font-weight="700" fill="#f0f6fc">Gustavo Bortolotti</text>
+    <text x="80" y="212" font-size="26" fill="#c9d1d9">Estudante de Análise e Desenvolvimento de Sistemas</text>
+    <text x="80" y="252" font-size="20" fill="#22d3ee" fill-opacity="0.9">Cruzeiro do Sul  ·  Aprendendo C, Git e GitHub</text>
+  </g>
+  <g transform="translate(941 1) scale(0.62)">
+    <path d="M355.6 172.4 A130 130 0 1 0 386 256 L316 256" transform="translate(0 0)" fill="none" stroke="url(#g)" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+    <g fill="none" stroke="#e6edf3" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M200 238L178 256L200 274"/><path d="M238 232L222 280"/><path d="M254 238L276 256L254 274"/>
+    </g>
+  </g>
+</svg>
