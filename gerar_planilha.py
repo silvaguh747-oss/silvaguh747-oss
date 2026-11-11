@@ -7,7 +7,9 @@ from openpyxl.chart import BarChart, DoughnutChart, LineChart, Reference
 from openpyxl.chart.label import DataLabelList
 from openpyxl.worksheet.hyperlink import Hyperlink
 
-OUT = "/home/user/silvaguh747-oss/Minha-Planilha-Financeira.xlsx"
+import sys
+GOOGLE = "--google" in sys.argv
+OUT = sys.argv[-1] if sys.argv[-1].endswith(".xlsx") else "/home/user/silvaguh747-oss/Minha-Planilha-Financeira.xlsx"
 FONT = "Arial"
 TEAL, TEAL2, MINT, SOFT, LINE, ORANGE, YEL = "1F6F66", "2E8B7E", "E3F1EE", "F4F7F6", "C9DAD6", "E8622C", "FFF8DC"
 RED, REDBG, GRN, GRNBG, AMB, AMBBG = "C0392B", "FADBD8", "1E8449", "D5F5E3", "9A6B00", "FCF3CF"
@@ -67,7 +69,8 @@ def dv(ws, formula, rng, err=None, typ="list", **kw):
     ws.add_data_validation(d); d.add(rng); return d
 
 wb = Workbook()
-names = ["Início", "Dashboard", "Diário", "Receitas", "Despesas"] + MESES + ["Cartão e Dívidas", "Reserva", "Investimentos", "Metas", "Planejamento", "Simulador", "Config"]
+MTABS = ["Janeiro"] if GOOGLE else MESES
+names = ["Início", "Dashboard", "Diário", "Receitas", "Despesas"] + MTABS + ["Cartão e Dívidas", "Reserva", "Investimentos", "Metas", "Planejamento", "Simulador", "Config"]
 S = {}
 S["Início"] = wb.active; S["Início"].title = "Início"
 for n in names[1:]: S[n] = wb.create_sheet(n)
@@ -155,13 +158,14 @@ note(D, "A4", "Salário e VA/VR já entram sozinhos (aba Config): não lance aqu
 note(D, "A3", "NÃO lance aqui: contas fixas (marque ☑ na aba do mês), parcelas (aba Cartão e Dívidas) nem pagamento de fatura. Assim nada é contado 2 vezes.", 9)
 head(D, 5, 1, ["Data", "Descrição", "Categoria", "Valor (R$)", "Entrada ou Saída", "Forma de pagamento", "Observações"])
 DF_, DL_ = 6, 2005
+LIM = lambda a, b: (min(b, a + 80) if GOOGLE else b)
 ex = [((2026, 11, 2), "Mercado do mês", "Alimentação", 320.40, "Saída", "Vale-alimentação"),
       ((2026, 11, 3), "Almoço", "Alimentação", 32.90, "Saída", "Vale-refeição"),
       ((2026, 11, 4), "Uber", "Transporte", 18.50, "Saída", "Pix"),
       ((2026, 11, 6), "Farmácia", "Saúde", 46.80, "Saída", "Cartão de débito"),
       ((2026, 11, 8), "Cinema", "Lazer", 60.00, "Saída", "Cartão de crédito"),
       ((2026, 11, 9), "Venda de item usado", "Renda extra", 120.00, "Entrada", "Pix")]
-for r in range(DF_, DL_ + 1):
+for r in range(DF_, LIM(DF_, DL_) + 1):
     i = r - DF_
     if i < len(ex):
         d, de, ca, v, t, f = ex[i]
@@ -203,7 +207,7 @@ band(R, f"A{RL0-2}:F{RL0-2}", "Registro de receitas extras (com data)", 11, TEAL
 head(R, RL0 - 1, 1, ["Data", "Tipo", "Descrição", "Valor (R$)", "Vai para", "Observações"])
 R[f"A{RL0}"] = dt.date(2026, 11, 10); R[f"B{RL0}"] = "Hora extra"; R[f"C{RL0}"] = "Horas extras de outubro"; R[f"D{RL0}"] = 150
 R[f"E{RL0}"] = "Dinheiro"; R[f"F{RL0}"] = "EXEMPLO – pode apagar"
-for r in range(RL0, RL1 + 1):
+for r in range(RL0, LIM(RL0, RL1) + 1):
     for col in "ABCDEF":
         c = R[f"{col}{r}"]; c.font = ft(False, 10, "0000FF"); c.border = Border(bottom=th)
     R[f"A{r}"].number_format = DATE; R[f"D{r}"].number_format = BRL
@@ -211,7 +215,7 @@ dv(R, f"={CATS_REC}", f"B{RL0}:B{RL1}"); dv(R, '"Dinheiro,Benefício"', f"E{RL0}
 RA, RB, RD, RE = [f"'Receitas'!${c}${RL0}:${c}${RL1}" for c in "ABDE"]
 
 def mrange(m):
-    X = f"DATE({YR},{m},1)"; NX = f"DATE({YR},{m+1},1)"
+    X = f"DATE({YR},{m},1)"; NX = f"DATE({YR},{m}+1,1)"
     return X, NX
 def crit(rng, m):
     X, NX = mrange(m); return f'{rng},">="&{X},{rng},"<"&{NX}'
@@ -262,8 +266,8 @@ for k in range(30):
         E[f"G{r}"] = "Vencimento de exemplo – ajuste"
     for col in "ABCDEFG": inp(E[f"{col}{r}"], BRL if col == "C" else None, col in "DF")
     mr = 32 + k
-    E[f"H{r}"] = f'=IF(A{r}="","",CHOOSE({MM},' + ",".join(f"{q(m)}!$L${mr}" for m in MESES) + "))"
-    E[f"I{r}"] = f'=IF(A{r}="","",CHOOSE({MM},' + ",".join(f"{q(m)}!$K${mr}" for m in MESES) + "))"
+    E[f"H{r}"] = f'=IF(A{r}="","",INDIRECT("\'"&INDEX({MESL},{MM})&"\'!L{mr}"))'
+    E[f"I{r}"] = f'=IF(A{r}="","",INDIRECT("\'"&INDEX({MESL},{MM})&"\'!K{mr}"))'
     out(E[f"H{r}"], BRL); out(E[f"I{r}"], center=True)
 dv(E, f"={CATS_DES}", f"B{EF}:B{EL}"); dv(E, f"={FORMAS}", f"E{EF}:E{EL}")
 dv(E, '"Todos os meses,' + ",".join(MESES) + '"', f"F{EF}:F{EL}")
@@ -319,7 +323,7 @@ def cred_diario(mexpr):
     X = f"DATE({YR},{mexpr},1)"; NX = f"DATE({YR},{mexpr}+1,1)"
     return f'SUMIFS({DV_},{DE},"Saída",{DFm},{CRED},{DA},">="&{X},{DA},"<"&{NX})'
 
-K["B4"] = f"=CHOOSE({MM}," + ",".join(f"{q(m)}!$G$17" for m in MESES) + ")"
+K["B4"] = f'=INDIRECT("\'"&INDEX({MESL},{MM})&"\'!G17")'
 K["B5"] = f'=B3-B4-SUMIFS(I{KF}:I{KL},A{KF}:A{KL},"Compra no cartão")'
 K["B6"] = "=IF(B3=0,0,1-B5/B3)"
 out(K["B4"], BRL0, True); out(K["B5"], BRL0, True); out(K["B6"], "0%", True)
@@ -364,7 +368,7 @@ V.conditional_formatting.add("B9", DataBarRule(start_type="num", start_value=0, 
 band(V, f"A{VF-2}:D{VF-2}", "Movimentações da reserva", 11, ORANGE, h=22, align=AL_L)
 head(V, VF - 1, 1, ["Data", "Tipo", "Valor (R$)", "Observações"], ORANGE)
 V[f"A{VF}"], V[f"B{VF}"], V[f"C{VF}"], V[f"D{VF}"] = dt.date(2026, 11, 5), "Depósito", 100, "EXEMPLO – pode apagar"
-for r in range(VF, VL + 1):
+for r in range(VF, LIM(VF, VL) + 1):
     for col in "ABCD":
         c = V[f"{col}{r}"]; c.font = ft(False, 10, "0000FF"); c.border = Border(bottom=th)
     V[f"A{r}"].number_format = DATE; V[f"C{r}"].number_format = BRL
@@ -408,7 +412,7 @@ for col in "ABCDEF": out(I[f"{col}15"], None if col == "A" else BRL, True, fill=
 band(I, f"A{IF0-2}:E{IF0-2}", "Movimentações", 11, "117A65", h=22, align=AL_L)
 head(I, IF0 - 1, 1, ["Data", "Tipo de investimento", "Operação", "Valor (R$)", "Observações"], "117A65")
 I[f"A{IF0}"], I[f"B{IF0}"], I[f"C{IF0}"], I[f"D{IF0}"], I[f"E{IF0}"] = dt.date(2026, 11, 7), "CDB", "Aporte", 50, "EXEMPLO – pode apagar"
-for r in range(IF0, IL0 + 1):
+for r in range(IF0, LIM(IF0, IL0) + 1):
     for col in "ABCDE":
         c = I[f"{col}{r}"]; c.font = ft(False, 10, "0000FF"); c.border = Border(bottom=th)
     I[f"A{r}"].number_format = DATE; I[f"D{r}"].number_format = BRL
@@ -442,10 +446,12 @@ CROW0 = 32; NCONT = 30; CROW1 = CROW0 + NCONT - 1
 CAT0 = 66; NCAT = 16; CAT1 = CAT0 + NCAT - 1; CATT = CAT1 + 1
 def paid(c): return f'OR({c}="☑",{c}=TRUE)'
 
-for mi, mname in enumerate(MESES, start=1):
+for mi, mname in enumerate(MTABS, start=1):
     M = S[mname]
-    X, NX = mrange(mi)
-    band(M, "B1:L1", f"ORGANIZAÇÃO DE {mname.upper()}", 18, TEAL, h=38)
+    MI = "$M$1"
+    X, NX = mrange(MI)
+    M["M1"] = mi
+    band(M, "B1:L1", f'="ORGANIZAÇÃO DE "&UPPER(INDEX({MESL},$M$1))', 18, TEAL, h=38)
     M.merge_cells("B2:L2")
     M["B2"] = '="Olá, "&Config!$B$3&"!  Pequenas ações geram grandes resultados."'
     M["B2"].font = ft(True, 10, TEAL, True); M["B2"].alignment = Alignment(horizontal="center")
@@ -457,7 +463,7 @@ for mi, mname in enumerate(MESES, start=1):
         M[f"{a}4"] = lab; M[f"{a}4"].font = ft(True, 9, "FFFFFF"); M[f"{a}4"].fill = fl(TEAL2); M[f"{a}4"].alignment = AL_C
         M[f"{a}5"] = f"={ref}"; M[f"{a}5"].font = ft(True, 14, TEAL); M[f"{a}5"].number_format = BRL0; M[f"{a}5"].alignment = AL_C
         M[f"{a}6"] = "Mês anterior:"; M[f"{a}6"].font = ft(False, 8, "6B7B78")
-        M[f"{b}6"] = f"={q(prev)}!{ref}" if prev else "=0"; M[f"{b}6"].font = ft(False, 8, "6B7B78"); M[f"{b}6"].number_format = BRL0
+        M[f"{b}6"] = f'=IF($M$1=1,0,INDIRECT("\'"&INDEX({MESL},$M$1-1)&"\'!{ref}"))'; M[f"{b}6"].font = ft(False, 8, "6B7B78"); M[f"{b}6"].number_format = BRL0
         for col in (a, b):
             for r in (4, 5, 6): M[f"{col}{r}"].border = BOX
             M[f"{col}5"].fill = fl("FFFFFF"); M[f"{col}6"].fill = fl(SOFT)
@@ -471,22 +477,22 @@ for mi, mname in enumerate(MESES, start=1):
     M.conditional_formatting.add("B9", FormulaRule(formula=["$G$23<0"], font=Font(name=FONT, bold=True, size=22, color=RED)))
     # Resumo
     resumo = [
-        (11, "Renda em dinheiro", "=" + rec_din(mi)),
-        (12, "Benefícios alimentares recebidos (VA/VR)", "=" + rec_ben(mi)),
+        (11, "Renda em dinheiro", "=" + rec_din(MI)),
+        (12, "Benefícios alimentares recebidos (VA/VR)", "=" + rec_ben(MI)),
         (13, "Contas fixas planejadas", f"=SUM(G{CROW0}:G{CROW1})"),
         (14, "Contas fixas pagas", f"=SUM(L{CROW0}:L{CROW1})"),
         (15, "Contas fixas pendentes", f'=SUMIFS(G{CROW0}:G{CROW1},K{CROW0}:K{CROW1},"Pendente")+SUMIFS(G{CROW0}:G{CROW1},K{CROW0}:K{CROW1},"ATRASADA")'),
         (16, "Saídas realizadas (contas pagas + gastos + parcelas)", f"=E{CATT}"),
-        (17, "   • no cartão de crédito (vai para a fatura)", f'=SUMIFS({DV_},{DE},"Saída",{DFm},{CRED},{crit(DA, mi)})+SUMIFS(L{CROW0}:L{CROW1},E{CROW0}:E{CROW1},{CRED})+' + parc(mi, "Compra no cartão")),
-        (18, "   • com benefícios (VA/VR)", f'=SUMIFS({DV_},{DE},"Saída",{DFm},{VA},{crit(DA, mi)})+SUMIFS({DV_},{DE},"Saída",{DFm},{VR},{crit(DA, mi)})+SUMIFS(L{CROW0}:L{CROW1},E{CROW0}:E{CROW1},{VA})+SUMIFS(L{CROW0}:L{CROW1},E{CROW0}:E{CROW1},{VR})'),
+        (17, "   • no cartão de crédito (vai para a fatura)", f'=SUMIFS({DV_},{DE},"Saída",{DFm},{CRED},{crit(DA, MI)})+SUMIFS(L{CROW0}:L{CROW1},E{CROW0}:E{CROW1},{CRED})+' + parc(MI, "Compra no cartão")),
+        (18, "   • com benefícios (VA/VR)", f'=SUMIFS({DV_},{DE},"Saída",{DFm},{VA},{crit(DA, MI)})+SUMIFS({DV_},{DE},"Saída",{DFm},{VR},{crit(DA, MI)})+SUMIFS(L{CROW0}:L{CROW1},E{CROW0}:E{CROW1},{VA})+SUMIFS(L{CROW0}:L{CROW1},E{CROW0}:E{CROW1},{VR})'),
         (19, "   • à vista (Pix, débito, dinheiro, boleto…)", "=G16-G17-G18"),
-        (20, "Reserva de emergência (depósitos − retiradas)", f'=SUMIFS({VC_},{VB_},"Depósito",{crit(VA_, mi)})-SUMIFS({VC_},{VB_},"Retirada",{crit(VA_, mi)})'),
-        (21, "Investimentos (aportes − retiradas)", f'=SUMIFS({ID},{IC},"Aporte",{crit(IA, mi)})-SUMIFS({ID},{IC},"Retirada",{crit(IA, mi)})'),
+        (20, "Reserva de emergência (depósitos − retiradas)", f'=SUMIFS({VC_},{VB_},"Depósito",{crit(VA_, MI)})-SUMIFS({VC_},{VB_},"Retirada",{crit(VA_, MI)})'),
+        (21, "Investimentos (aportes − retiradas)", f'=SUMIFS({ID},{IC},"Aporte",{crit(IA, MI)})-SUMIFS({ID},{IC},"Retirada",{crit(IA, MI)})'),
         (22, "Saldo atual em conta (o que já saiu de fato)", "=G11-G19-G20-G21"),
         (23, "Restante para gastar", "=G22-G15-G17"),
         (24, "Saldo dos benefícios (VA/VR)", "=G12-G18"),
         (25, "Contas atrasadas", f'=COUNTIF(K{CROW0}:K{CROW1},"ATRASADA")'),
-        (26, "Parcelas do mês (cartão + dívidas)", "=" + parc(mi)),
+        (26, "Parcelas do mês (cartão + dívidas)", "=" + parc(MI)),
         (27, "Gastos variáveis (Diário)", "=G16-G14-G26"),
         (28, "Reservas + investimentos", "=G20+G21"),
     ]
@@ -502,13 +508,13 @@ for mi, mname in enumerate(MESES, start=1):
     # Contas
     band(M, f"B{CROW0-2}:L{CROW0-2}", "CONTAS FIXAS DO MÊS  —  marque ☑ quando pagar", 11, TEAL, h=24)
     head(M, CROW0 - 1, 2, ["Pago", "Conta", "Categoria", "Forma de pagamento", "Vencimento", "Planejado", "Valor pago", "Data do pagamento", "Diferença", "Status", "Total pago"])
-    mref = f"Config!$L${10+mi}"
+    mref = f"INDEX({MESL},$M$1)"
     for k in range(NCONT):
         r = CROW0 + k; dr = EF + k
         M[f"C{r}"] = f'=IF(AND(Despesas!$A${dr}<>"",OR(Despesas!$F${dr}="Todos os meses",Despesas!$F${dr}="",Despesas!$F${dr}={mref})),Despesas!$A${dr},"")'
         M[f"D{r}"] = f'=IF(C{r}="","",Despesas!$B${dr})'
         M[f"E{r}"] = f'=IF(C{r}="","",Despesas!$E${dr})'
-        M[f"F{r}"] = f'=IF(OR(C{r}="",N(Despesas!$D${dr})=0),"",DATE({YR},{mi},MIN(Despesas!$D${dr},DAY(EOMONTH({X},0)))))'
+        M[f"F{r}"] = f'=IF(OR(C{r}="",N(Despesas!$D${dr})=0),"",DATE({YR},{MI},MIN(Despesas!$D${dr},DAY(EOMONTH({X},0)))))'
         M[f"G{r}"] = f'=IF(C{r}="",0,N(Despesas!$C${dr}))'
         M[f"J{r}"] = f'=IF(AND(C{r}<>"",{paid(f"B{r}")}),L{r}-G{r},"")'
         M[f"K{r}"] = f'=IF(C{r}="","",IF({paid(f"B{r}")},"Pago",IF(AND(F{r}<>"",F{r}<TODAY()),"ATRASADA","Pendente")))'
@@ -532,8 +538,8 @@ for mi, mname in enumerate(MESES, start=1):
         r = CAT0 + i; cr = 35 + i
         M[f"C{r}"] = f'=IF(Config!$A${cr}="","",Config!$A${cr})'
         M[f"D{r}"] = f'=IF(C{r}="",0,N(Config!$C${cr}))'
-        M[f"E{r}"] = (f'=IF(C{r}="",0,SUMIFS({DV_},{DC},C{r},{DE},"Saída",{crit(DA, mi)})'
-                      f'+SUMIFS($L${CROW0}:$L${CROW1},$D${CROW0}:$D${CROW1},C{r})+{parc(mi, cat=f"C{r}")})')
+        M[f"E{r}"] = (f'=IF(C{r}="",0,SUMIFS({DV_},{DC},C{r},{DE},"Saída",{crit(DA, MI)})'
+                      f'+SUMIFS($L${CROW0}:$L${CROW1},$D${CROW0}:$D${CROW1},C{r})+{parc(MI, cat=f"C{r}")})')
         M[f"F{r}"] = f'=IF(OR(C{r}="",D{r}=0),"",E{r}/D{r})'
         M[f"G{r}"] = f'=IF(C{r}="","",IF(D{r}=0,IF(E{r}>0,"Sem limite","—"),IF(E{r}>D{r},"Acima do limite",IF(E{r}>=0.8*D{r},"Atenção","OK"))))'
         for col, fmt in zip("CDEFG", [None, BRL, BRL, "0%", None]): out(M[f"{col}{r}"], fmt, col == "C", center=col == "G")
@@ -570,17 +576,17 @@ cols = ["Mês", "Receita prevista", "Receita realizada (dinheiro)", "Benefícios
 head(P, 4, 1, cols)
 P.row_dimensions[4].height = 44
 for i, m in enumerate(MESES, start=1):
-    r = 4 + i; s = q(m)
+    r = 4 + i
     P[f"A{r}"] = m
     P[f"B{r}"] = f'=SUMIFS({RR_V},{RR_T},"Dinheiro",{RR_A},"Sim")'
     for col, cell in zip("CDEFGHIJKLMN", ["G11", "G12", "G13", "G14", "G27", "G17", "G26", "G16", "G20", "G21", "G22", "G23"]):
-        P[f"{col}{r}"] = f"={s}!{cell}"
+        P[f"{col}{r}"] = f'=INDIRECT("\'"&$A{r}&"\'!{cell}")'
     P[f"O{r}"] = f"=N{r}+K{r}+L{r}"
     P[f"P{r}"] = f'=IF(C{r}=0,"",O{r}/C{r})'
     P[f"Q{r}"] = f'=IF(C{r}=0,"",(E{r}+I{r})/C{r})'
     P[f"R{r}"] = f"='Reserva'!$I${3+i}+'Investimentos'!$L${4+i}"
     P[f"S{r}"] = f"=O{r}-O{r-1}" if i > 1 else '=""'
-    P[f"T{r}"] = (f'=IF(AND({YR}=YEAR(TODAY()),{i}=MONTH(TODAY())),MAX(0,G{r}-{s}!$G$18)/DAY(TODAY())*(DAY(EOMONTH(TODAY(),0))-DAY(TODAY())),0)')
+    P[f"T{r}"] = (f'=IF(AND({YR}=YEAR(TODAY()),{i}=MONTH(TODAY())),MAX(0,G{r}-INDIRECT("\'"&$A{r}&"\'!G18"))/DAY(TODAY())*(DAY(EOMONTH(TODAY(),0))-DAY(TODAY())),0)')
     for col in "ABCDEFGHIJKLMNOPQRST":
         out(P[f"{col}{r}"], None if col == "A" else "0%" if col in "PQ" else BRL, col in "AN")
 P["A17"] = "TOTAL / MÉDIA"
@@ -597,7 +603,7 @@ for i in range(NCAT):
     r = 22 + i; cr = 35 + i
     P[f"A{r}"] = f'=IF(Config!$A${cr}="","",Config!$A${cr})'
     for j, m in enumerate(MESES):
-        col = chr(ord("B") + j); P[f"{col}{r}"] = f"={q(m)}!$E${CAT0+i}"
+        col = chr(ord("B") + j); P[f"{col}{r}"] = f'=INDIRECT("\'{m}\'!E{CAT0+i}")'
         out(P[f"{col}{r}"], '#,##0.00;-#,##0.00;"-"')
     P[f"N{r}"] = f"=SUM(B{r}:M{r})"; out(P[f"A{r}"]); out(P[f"N{r}"], '#,##0.00;-#,##0.00;"-"', True)
 PCAT0, PCAT1 = 22, 22 + NCAT - 1
@@ -708,9 +714,9 @@ B["L3"] = "Trocar mês:"; B["L3"].font = ft(True, 9, TEAL); B["L3"].alignment = 
 link(B["M3"], "Config", "Config ▸")
 for j, m in enumerate(MESES):
     c = B.cell(row=4, column=2 + (j % 12), value=m[:3])
-    link(c, m, m[:3]); c.fill = fl(MINT); c.font = ft(True, 9, TEAL)
+    link(c, m if m in S else "Janeiro", m[:3]); c.fill = fl(MINT); c.font = ft(True, 9, TEAL)
 B.row_dimensions[3].height = 22; B.row_dimensions[4].height = 20
-BM = lambda cell: f"CHOOSE({MM}," + ",".join(f"{q(m)}!{cell}" for m in MESES) + ")"
+BM = lambda cell: f'INDIRECT("\'"&INDEX({MESL},{MM})&"\'!{cell.replace("$","")}")'
 kpis = [
     ("Meu salário do mês", f"=IF(Config!$D$11=\"Sim\",{SAL},0)", '="Adiantamentos: R$ "&FIXED(INDEX(Receitas!$C$16:$C$27,' + MM + '),2)'),
     ("Renda total (dinheiro + benefícios)", f"={PI('C')}+{PI('D')}", f'="Em dinheiro: R$ "&FIXED({PI("C")},2)'),
@@ -816,7 +822,7 @@ for j, sh in enumerate(navs2):
     c = N_.cell(row=4 + j // 7, column=2 + j % 7); link(c, sh, sh)
 N_.row_dimensions[4].height = 26; N_.row_dimensions[5].height = 26
 for j, m in enumerate(MESES):
-    c = N_.cell(row=6 + j // 7, column=2 + j % 7); link(c, m, m); c.fill = fl(MINT); c.font = ft(True, 9, TEAL)
+    c = N_.cell(row=6 + j // 7, column=2 + j % 7); link(c, m if m in S else "Janeiro", m); c.fill = fl(MINT); c.font = ft(True, 9, TEAL)
 blocks = [
     ("🚀 COMEÇAR EM 4 PASSOS", [
         "1) Config: coloque seu nome e confira salário e benefícios (já vêm R$ 1.500, VA R$ 890 e VR R$ 400 — edite se mudar).",
@@ -854,9 +860,10 @@ for ttl, lines in blocks:
 widths(N_, {"A": 2, **{chr(c): 17 for c in range(ord("B"), ord("I"))}})
 
 # exemplo: contas pagas em novembro
-NOV = S["Novembro"]
-NOV[f"B{CROW0}"] = "☑"; NOV[f"H{CROW0}"] = 370; NOV[f"I{CROW0}"] = dt.date(2026, 11, 5)
-NOV[f"B{CROW0+1}"] = "☑"; NOV[f"H{CROW0+1}"] = 210; NOV[f"I{CROW0+1}"] = dt.date(2026, 11, 10)
+NOV = S.get("Novembro")
+if NOV is not None:
+  NOV[f"B{CROW0}"] = "☑"; NOV[f"H{CROW0}"] = 370; NOV[f"I{CROW0}"] = dt.date(2026, 11, 5)
+  NOV[f"B{CROW0+1}"] = "☑"; NOV[f"H{CROW0+1}"] = 210; NOV[f"I{CROW0+1}"] = dt.date(2026, 11, 10)
 
 for ws in wb.worksheets:
     ws.page_setup.orientation = "landscape"; ws.page_setup.fitToWidth = 1; ws.page_setup.fitToHeight = 0
